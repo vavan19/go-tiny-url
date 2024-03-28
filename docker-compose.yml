@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: .docker/app/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DB: "urlshortener"
+      MONGO_COLLECTION: "urls"
+  
+  mongo:
+    image: mongo:latest
+    container_name: "mongo"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
