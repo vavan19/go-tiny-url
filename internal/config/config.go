@@ -14,17 +14,21 @@ type Config struct {
 	StartRange int // Starting range for this instance
 	EndRange   int // Ending range for this instance
 	MongoDBURL string
+	Port       int
+	Host       string
 }
 
-func Load() Config {
+func Load() *Config {
 	var cfg Config
 
 	flag.IntVar(&cfg.StartRange, "startRange", 0, "Starting range for this instance")
 	flag.IntVar(&cfg.EndRange, "endRange", 1000, "Ending range for this instance")
+	flag.IntVar(&cfg.Port, "port", 8080, "Port for this instance")
+	flag.StringVar(&cfg.Host, "host", "http://localhost", "Host for this instance")
 	flag.StringVar(&cfg.MongoDBURL, "mongoDBURL", "mongodb://mongo:27017", "Ending mongoDBURL for this instance")
 	flag.Parse()
 
-	return cfg
+	return &cfg
 }
 
 func (c *Config) Validate() error {

@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/cmd/server/main.go",
-      "args": ["-startRange", "6000000", "-endRange", "12000000"],
+      "args": ["-startRange", "6000000", "-endRange", "12000000", "-mongoDBURL", "mongodb://localhost:27017"],
     }
   ]
 }

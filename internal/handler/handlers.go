@@ -3,20 +3,24 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"tiny_url/internal/config"
 	"tiny_url/internal/counter"
 	"tiny_url/internal/storage"
 	"tiny_url/pkg/utils"
 )
 
 type URLHandler struct {
-	Storage storage.Storage
-	Counter *counter.Counter
+	storage storage.Storage
+	counter *counter.Counter
+	cfg     *config.Config
 }
+
 // NewURLHandler creates a new URLHandler with the given storage.
-func NewURLHandler(storage storage.Storage, couter *counter.Counter) *URLHandler {
+func NewURLHandler(storage storage.Storage, couter *counter.Counter, cfg *config.Config) *URLHandler {
 	return &URLHandler{
-		Storage: storage,
-		Counter: couter,
+		storage: storage,
+		counter: couter,
+		cfg:     cfg,
 	}
 }
 
@@ -38,23 +42,23 @@ func (h *URLHandler) ShortenURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.Counter.Value()
+	id := h.counter.Value()
 	if id == -1 {
 		http.Error(w, "ID range exhausted", http.StatusInternalServerError)
 		return
 	}
 	shortURL := utils.EncodeToBase62(id)
-	fullShortURL := fmt.Sprintf("http://localhost:8080/%s", shortURL)
+	fullShortURL := fmt.Sprintf("%s:%d/%s", h.cfg.Host, h.cfg.Port, shortURL)
 
 	// Save the mapping and return the shortened URL.
-	h.Storage.Save(fullShortURL, originalURL)
+	h.storage.Save(fullShortURL, originalURL)
 	fmt.Fprintf(w, "Shortened URL: %s\n", fullShortURL)
 }
 
 // Redirect handles redirection from a shortened URL to the original URL.
 func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
-	shortURL := "http://localhost:8080" + r.URL.Path
-	originalURL, exists := h.Storage.Load(shortURL)
+	shortURL := fmt.Sprintf("%s:%d", h.cfg.Host, h.cfg.Port) + r.URL.Path
+	originalURL, exists := h.storage.Load(shortURL)
 	if !exists {
 		http.NotFound(w, r)
 		return

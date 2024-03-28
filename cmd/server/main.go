@@ -22,14 +22,12 @@ func main() {
 
 	counter := counter.New(cfg.StartRange)
 
-	urlHandler := handler.NewURLHandler(storage, counter)
-
-
+	urlHandler := handler.NewURLHandler(storage, counter, cfg)
 	http.HandleFunc("/shorten", urlHandler.ShortenURL)
 	http.HandleFunc("/", urlHandler.Redirect)
 
-	fmt.Printf("Server listening on port 8080 with range %d to %d...\n", cfg.StartRange, cfg.EndRange)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Printf("Server listening on port %d with range %d to %d...\n", cfg.Port, cfg.StartRange, cfg.EndRange)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), nil); err != nil {
 		fmt.Printf("Server failed to start: %v\n", err)
 	}
 }
