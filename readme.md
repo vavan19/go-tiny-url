@@ -8,4 +8,4 @@ Golang implementation of Tiny URL service
 
 ## How to Test
 
-curl -X POST http://localhost:8080/shorten -d "url=https://google.com"
+`curl -X POST http://localhost:8080/shorten -d "url=https://google.com"`
